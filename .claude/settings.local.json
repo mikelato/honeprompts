@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(git *)"
+      "PowerShell(git *)",
+      "PowerShell(New-Item *)"
     ]
   }
 }
