@@ -1,195 +1,249 @@
 """
-Content Lane — Digital Product Generator.
+Content Lane — Digital Product Generator (two-pass).
 
-Asks Claude to design and write a complete digital product (prompt pack),
-renders it as a branded PromptVault PDF, and publishes it to Gumroad.
+Pass 1: Claude Opus designs the product structure (sections + metadata).
+Pass 2: Claude Sonnet fills in each section's prompts individually.
+Final:  Renders branded PDF, saves locally, auto-publishes if Lemon Squeezy is configured.
 
-Run locally:  python run.py content:generate
+Run: python run.py content:generate
 """
 import json
 import os
 import sys
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from shared.claude_client import orchestrate
-from shared.gumroad_client import create_product, get_products
 from shared.pdf_builder import build_prompt_pack
 
 BRAND_NAME = "PromptVault"
 BRAND_TAGLINE = "Ready-to-use AI prompts for people who build things."
+PRODUCTS_DIR = Path(__file__).resolve().parents[2] / "products"
 
-PRODUCT_SCHEMA = json.dumps({
+# ── Pass 1: structure schema ───────────────────────────────────────────────────
+STRUCTURE_SCHEMA = json.dumps({
     "type": "object",
     "properties": {
-        "title": {
+        "title":       {"type": "string", "description": "PDF cover title — benefit-driven"},
+        "subtitle":    {"type": "string", "description": "e.g. '47 ready-to-use prompts for landing better clients faster'"},
+        "slug":        {"type": "string", "description": "lowercase-kebab-case filename, e.g. 'freelance-client-acquisition'"},
+        "store_name":  {"type": "string", "description": "Store listing name, 60 chars max"},
+        "store_description": {
             "type": "string",
-            "description": "PDF cover title — benefit-driven, e.g. 'The Freelance Client Acquisition Prompt Pack'"
+            "description": "200-300 word store description. Pain → bullets of what's inside → format + compatibility. Plain text."
         },
-        "subtitle": {
-            "type": "string",
-            "description": "PDF subtitle — what they get, e.g. '42 ready-to-use prompts for landing better clients faster'"
-        },
-        "gumroad_name": {
-            "type": "string",
-            "description": "Short Gumroad product name (60 chars max)"
-        },
-        "gumroad_description": {
-            "type": "string",
-            "description": (
-                "Gumroad/Etsy product description. Lead with the pain point. "
-                "List what's inside with bullet points. End with format + compatibility note. "
-                "200-300 words. Plain text only."
-            )
-        },
-        "price_cents": {
-            "type": "integer",
-            "description": "Price in cents. Use $17, $27, or $37 — pick based on prompt count and depth."
-        },
-        "intro": {
-            "type": "string",
-            "description": "PDF intro paragraph, 80-120 words. Speak to the reader's frustration, then promise the solution."
-        },
+        "price_cents": {"type": "integer", "description": "1700, 2700, or 3700"},
+        "intro":       {"type": "string", "description": "80-120 word PDF intro paragraph"},
+        "bonus_tips":  {"type": "array", "minItems": 5, "maxItems": 7, "items": {"type": "string"}},
+        "etsy_tags":   {"type": "array", "maxItems": 13, "items": {"type": "string", "maxLength": 20}},
         "sections": {
             "type": "array",
             "minItems": 5,
-            "maxItems": 7,
+            "maxItems": 6,
             "items": {
                 "type": "object",
                 "properties": {
-                    "name": {"type": "string"},
+                    "name":        {"type": "string"},
                     "description": {"type": "string", "description": "1-2 sentences on what this section covers"},
-                    "prompts": {
+                    "prompt_labels": {
                         "type": "array",
-                        "minItems": 6,
-                        "maxItems": 10,
+                        "minItems": 7,
+                        "maxItems": 9,
                         "items": {
                             "type": "object",
                             "properties": {
-                                "label": {"type": "string", "description": "Short label, e.g. 'Cold outreach opener'"},
-                                "prompt": {
-                                    "type": "string",
-                                    "description": (
-                                        "The actual prompt text — complete, ready to paste into Claude or ChatGPT. "
-                                        "Use [BRACKETS] only for unavoidable variables like [company name]. "
-                                        "Must be immediately usable with zero editing."
-                                    )
-                                },
-                                "use_case": {
-                                    "type": "string",
-                                    "description": "One sentence: when to use this prompt and what outcome it produces"
-                                }
+                                "label":    {"type": "string", "description": "Short label, e.g. 'Cold outreach opener'"},
+                                "use_case": {"type": "string", "description": "One sentence: when to use this and what outcome it produces"}
                             },
-                            "required": ["label", "prompt", "use_case"]
+                            "required": ["label", "use_case"]
                         }
                     }
                 },
-                "required": ["name", "description", "prompts"]
+                "required": ["name", "description", "prompt_labels"]
             }
-        },
-        "bonus_tips": {
-            "type": "array",
-            "minItems": 5,
-            "maxItems": 8,
-            "items": {
-                "type": "string",
-                "description": "Actionable tip for getting better results from AI prompts"
-            }
-        },
-        "etsy_tags": {
-            "type": "array",
-            "maxItems": 13,
-            "items": {"type": "string", "maxLength": 20},
-            "description": "Etsy SEO tags — single words or two-word phrases, no special chars"
         }
     },
-    "required": [
-        "title", "subtitle", "gumroad_name", "gumroad_description",
-        "price_cents", "intro", "sections", "bonus_tips", "etsy_tags"
-    ]
+    "required": ["title", "subtitle", "slug", "store_name", "store_description",
+                 "price_cents", "intro", "bonus_tips", "etsy_tags", "sections"]
 })
 
-# Niches ordered by Etsy/Gumroad search demand and buyer intent
+# ── Pass 2: prompts schema (per section) ──────────────────────────────────────
+PROMPTS_SCHEMA = json.dumps({
+    "type": "object",
+    "properties": {
+        "prompts": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "label":    {"type": "string"},
+                    "prompt":   {
+                        "type": "string",
+                        "description": (
+                            "Complete, paste-ready prompt. Full sentences. Specific instructions. "
+                            "Use [BRACKETS] only for truly unavoidable variables like [company name]. "
+                            "Minimum 3 sentences. Zero editing required by buyer."
+                        )
+                    },
+                    "use_case": {"type": "string"}
+                },
+                "required": ["label", "prompt", "use_case"]
+            }
+        }
+    },
+    "required": ["prompts"]
+})
+
 NICHES = [
     "freelance client acquisition and outreach",
-    "LinkedIn content creation and personal brand",
+    "LinkedIn content creation and personal brand building",
     "email marketing and newsletter writing",
     "e-commerce product listings and Etsy shop optimization",
     "YouTube script writing and channel growth",
     "solopreneur business planning and strategy",
-    "social media content creation for coaches",
+    "social media content creation for coaches and consultants",
     "podcast guest outreach and show growth",
     "job search, resume writing, and interview prep",
-    "Etsy seller marketing and product launch",
     "real estate agent marketing and client communication",
-    "online course creation and launch",
+    "online course creation and launch marketing",
+    "SaaS founder go-to-market and cold outreach",
 ]
 
 
-def pick_niche(existing_products: list[dict]) -> str:
-    existing_names = " ".join(p.get("name", "").lower() for p in existing_products)
+def pick_niche(existing_slugs: set[str]) -> str:
     for niche in NICHES:
         keyword = niche.split()[0]
-        if keyword not in existing_names:
+        if not any(keyword in s for s in existing_slugs):
             return niche
-    return NICHES[len(existing_products) % len(NICHES)]
+    return NICHES[len(existing_slugs) % len(NICHES)]
 
 
-def run():
-    existing = get_products()
-    niche = pick_niche(existing)
-    print(f"[lane_content] Niche selected: {niche}")
-    print(f"[lane_content] Existing products: {len(existing)}")
+def get_existing_slugs() -> set[str]:
+    PRODUCTS_DIR.mkdir(exist_ok=True)
+    return {p.stem for p in PRODUCTS_DIR.glob("*.pdf")}
 
-    context = {
-        "brand": BRAND_NAME,
-        "tagline": BRAND_TAGLINE,
-        "niche": niche,
-        "target_buyer": "founder, freelancer, or solopreneur who uses Claude or ChatGPT daily",
-        "goal": (
-            "Design a complete, immediately sellable prompt pack. "
-            "Every prompt must be ready to paste — no placeholders except unavoidable variables like [company name]. "
-            "Aim for 40-60 total prompts across 5-7 sections. "
-            "Price at $17, $27, or $37 based on depth — err toward $27."
-        ),
-        "date": datetime.now(timezone.utc).isoformat(),
-    }
 
-    print("[lane_content] Generating product with Claude Opus...")
-    product_data = orchestrate(
+def run() -> dict:
+    existing_slugs = get_existing_slugs()
+    niche = pick_niche(existing_slugs)
+    print(f"\n[generate] Niche    : {niche}")
+    print(f"[generate] Catalog  : {len(existing_slugs)} existing products")
+
+    # ── Pass 1: design structure ───────────────────────────────────────────────
+    print("[generate] Pass 1/2 — designing product structure (Opus)...")
+    structure = orchestrate(
         lane="content",
-        task="Design and write a complete, immediately sellable PromptVault digital product for the given niche.",
-        context=context,
-        response_schema=PRODUCT_SCHEMA,
+        task="Design a complete PromptVault prompt pack structure for the given niche.",
+        context={
+            "brand": BRAND_NAME,
+            "tagline": BRAND_TAGLINE,
+            "niche": niche,
+            "target_buyer": "founder, freelancer, or solopreneur using Claude or ChatGPT daily",
+            "goal": (
+                "Create 5-6 sections with 7-9 prompt slots each (labels + use cases only, "
+                "not the prompt text yet). Choose $17/$27/$37 pricing based on depth. "
+                "Make every label specific and actionable."
+            ),
+            "date": datetime.now(timezone.utc).isoformat(),
+        },
+        response_schema=STRUCTURE_SCHEMA,
         use_opus=True,
     )
 
-    # Inject brand into PDF metadata
-    product_data["brand"] = BRAND_NAME
-    product_data["tagline"] = BRAND_TAGLINE
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        pdf_path = os.path.join(tmpdir, "product.pdf")
-        print("[lane_content] Building PDF...")
-        build_prompt_pack(pdf_path, product_data)
-
-        print(f"[lane_content] Publishing to Gumroad: {product_data['gumroad_name']}")
-        gum_product = create_product(
-            name=product_data["gumroad_name"],
-            description=product_data["gumroad_description"],
-            price_cents=product_data["price_cents"],
-            file_path=pdf_path,
+    # ── Pass 2: write prompts section by section ───────────────────────────────
+    print(f"[generate] Pass 2/2 — writing prompts for {len(structure['sections'])} sections (Sonnet)...")
+    full_sections = []
+    for i, section in enumerate(structure["sections"]):
+        print(f"           Section {i+1}/{len(structure['sections'])}: {section['name']}")
+        result = orchestrate(
+            lane="content",
+            task="Write the complete prompt text for each slot in this section.",
+            context={
+                "product_title": structure["title"],
+                "niche": niche,
+                "section_name": section["name"],
+                "section_description": section["description"],
+                "prompt_slots": section["prompt_labels"],
+                "instruction": (
+                    "Write a complete, paste-ready prompt for each slot. "
+                    "Each prompt must be self-contained with full instructions — "
+                    "the buyer should get a real, useful output with zero extra thinking. "
+                    "Minimum 3 sentences per prompt."
+                ),
+            },
+            response_schema=PROMPTS_SCHEMA,
+            use_opus=False,
         )
+        full_sections.append({
+            "name": section["name"],
+            "description": section["description"],
+            "prompts": result["prompts"],
+        })
 
-    url = gum_product.get("short_url", "")
+    # ── Assemble final product ─────────────────────────────────────────────────
+    product_data = {
+        **structure,
+        "sections": full_sections,
+        "brand": BRAND_NAME,
+        "tagline": BRAND_TAGLINE,
+    }
+
+    slug = product_data.get("slug", "product")
+    pdf_path = str(PRODUCTS_DIR / f"{slug}.pdf")
+    meta_path = str(PRODUCTS_DIR / f"{slug}.json")
+
+    print("[generate] Rendering PDF...")
+    build_prompt_pack(pdf_path, product_data)
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(product_data, f, indent=2, ensure_ascii=False)
+
     price = product_data["price_cents"] / 100
-    print(f"\n✓ LIVE on Gumroad: {url} — ${price:.2f}")
-    print(f"  Etsy tags ready: {', '.join(product_data.get('etsy_tags', []))}")
-    print(f"  Next: python run.py content:pin\n")
-    return gum_product
+    prompt_count = sum(len(s.get("prompts", [])) for s in full_sections)
+
+    print(f"\n{'='*55}")
+    print(f"  PRODUCT READY")
+    print(f"{'='*55}")
+    print(f"  Title    : {product_data['title']}")
+    print(f"  Price    : ${price:.2f}")
+    print(f"  Prompts  : {prompt_count} across {len(full_sections)} sections")
+    print(f"  PDF      : products/{slug}.pdf")
+    print(f"{'='*55}")
+    print()
+    print("  NEXT — list it:")
+    print("  Option A (auto): add LEMON_API_KEY + LEMON_STORE_ID to .env")
+    print("                   then run: python run.py content:publish")
+    print("  Option B (Etsy manual):")
+    print(f"    Title : {product_data['store_name']}")
+    print(f"    Price : ${price:.2f}")
+    print(f"    Tags  : {', '.join(product_data.get('etsy_tags', []))}")
+    print(f"    Desc  : see products/{slug}.json → store_description")
+    print(f"{'='*55}\n")
+
+    # Auto-publish to Lemon Squeezy if configured
+    lemon_key = os.environ.get("LEMON_API_KEY", "")
+    if lemon_key and not lemon_key.startswith("..."):
+        _publish_to_lemon(product_data, pdf_path)
+
+    return product_data
+
+
+def _publish_to_lemon(product_data: dict, pdf_path: str):
+    from shared.lemon_client import get_store_id, create_product
+    try:
+        store_id = get_store_id()
+        product = create_product(
+            store_id=store_id,
+            name=product_data["store_name"],
+            description=product_data["store_description"],
+            price_cents=product_data["price_cents"],
+        )
+        url = product.get("attributes", {}).get("buy_now_url", "")
+        print(f"  ✓ Live on Lemon Squeezy: {url}")
+        print(f"  Upload PDF: app.lemonsqueezy.com → Products → Files")
+    except Exception as e:
+        print(f"  Lemon Squeezy publish failed: {e}")
 
 
 if __name__ == "__main__":

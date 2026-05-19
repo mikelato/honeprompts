@@ -119,3 +119,6 @@ playwright-report/
 .vercel/
 *.bak
 *.tmp
+
+products/*.pdf
+products/*.json

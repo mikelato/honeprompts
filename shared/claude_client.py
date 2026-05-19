@@ -49,7 +49,7 @@ Respond with valid JSON matching this schema:
 
     response = client.messages.create(
         model=model,
-        max_tokens=4096,
+        max_tokens=8000,
         system=[
             {
                 "type": "text",
@@ -66,4 +66,20 @@ Respond with valid JSON matching this schema:
         text = text.split("```")[1]
         if text.startswith("json"):
             text = text[4:]
-    return json.loads(text.strip())
+    text = text.strip()
+
+    # If response was truncated, attempt to close the JSON
+    stop_reason = response.stop_reason
+    if stop_reason == "max_tokens":
+        # Try to salvage by closing open structures
+        for closing in ["]}]}", "]}", "}"]:
+            try:
+                return json.loads(text + closing)
+            except json.JSONDecodeError:
+                pass
+        raise RuntimeError(
+            f"Claude response truncated at max_tokens and could not be repaired. "
+            f"Last 100 chars: ...{text[-100:]}"
+        )
+
+    return json.loads(text)
