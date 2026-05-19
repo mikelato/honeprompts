@@ -18,8 +18,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from shared.claude_client import orchestrate
 from shared.pdf_builder import build_prompt_pack
 
-BRAND_NAME = "PromptVault"
-BRAND_TAGLINE = "Ready-to-use AI prompts for people who build things."
+BRAND_NAME = "Hone"
+BRAND_TAGLINE = "Sharpen your AI output."
 PRODUCTS_DIR = Path(__file__).resolve().parents[2] / "products"
 
 # ── Pass 1: structure schema ───────────────────────────────────────────────────

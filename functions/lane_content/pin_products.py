@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from shared.claude_client import orchestrate
 from shared.gumroad_client import get_products
 
-BRAND_NAME = "PromptVault"
+BRAND_NAME = "Hone"
 
 BOARDS = [
     "AI Prompts for Entrepreneurs",

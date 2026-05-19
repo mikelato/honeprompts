@@ -1,120 +1,146 @@
-# PromptVault — Brand Copy
+# Hone — Brand Guide
 
-## Tagline
-**"Ready-to-use AI prompts for people who build things."**
+## The one-line pitch
+**"Sharpen your AI output."**
 
----
+## What Hone is
+Hone sells professional AI prompt packs, templates, and tools for founders, freelancers, and solopreneurs who use Claude and ChatGPT daily. Every product is built around one belief: the difference between a generic AI answer and a useful one is knowing exactly how to ask.
 
-## Gumroad Profile Bio (160 chars max)
-AI prompt packs for founders & solopreneurs. Copy, paste, and get more done in less time. 30,000+ hours of work saved and counting.
+## Brand voice
+- Direct, no fluff
+- Confident without being arrogant
+- Practical — always about results, never about the technology itself
+- Sounds like advice from a sharp colleague, not a SaaS landing page
 
-## Gumroad About Page (long form)
-PromptVault creates professional AI prompt packs for entrepreneurs, freelancers, and founders who use Claude and ChatGPT daily.
-
-Every prompt in every pack is tested, ready to use, and written to get real results — not generic outputs. We cover everything from client acquisition and content creation to email writing, financial analysis, and business strategy.
-
-No fluff. No placeholders. Just prompts that work.
-
----
-
-## Etsy Shop About (500–2000 chars)
-PromptVault creates professional AI prompt packs for entrepreneurs, freelancers, and founders.
-
-Every product in our shop is built around one idea: your time is the most valuable thing you have. Our prompt packs are tested collections of ready-to-use Claude and ChatGPT prompts — designed so you can copy, paste, and get results immediately.
-
-No editing. No guessing. No staring at a blank screen.
-
-We focus on the areas that matter most to people who build things:
-• Client acquisition and outreach
-• Content creation and social media
-• Email marketing and copywriting
-• Business strategy and planning
-• Productivity and workflow automation
-
-Each pack includes 30–60 prompts organized by use case, with clear descriptions and real examples so you know exactly when and how to use each one.
-
-Questions? Message us anytime — we read every note.
+## What to avoid
+- Never say "AI-powered," "cutting-edge," or "next-generation"
+- No hype language (game-changer, revolutionary, unlock)
+- Don't mention Claude or ChatGPT in the brand name itself — we're tool-agnostic
+- No exclamation marks in brand copy
 
 ---
 
-## Etsy Shop Policies
+## Platform setup — exact copy to use
 
-**Processing time:** Instant digital delivery — your download is available immediately after purchase.
+### Lemon Squeezy
+- **Store name:** Hone
+- **Store handle/slug:** gethone
+- **Tagline:** Sharpen your AI output.
+- **Store description:**
+  Hone makes professional AI prompt packs for founders, freelancers, and solopreneurs.
+  Every prompt is complete, tested, and ready to paste into Claude or ChatGPT — no editing, no guessing, no staring at a blank screen. Pick your use case, download instantly, get a real result in 60 seconds.
 
-**Refunds:** Because digital products are delivered instantly, we do not offer refunds. If you have any issue with your download, contact us and we'll make it right.
+### Gumroad (if/when API works)
+- **Display name:** Hone
+- **Bio:** Professional AI prompt packs. Copy, paste, get results. New packs added weekly.
 
-**File format:** PDF, optimized for screen and print.
+### Etsy
+- **Shop name:** HoneCo  (if Hone is taken, try HonePrompts)
+- **Shop tagline:** AI prompt packs for people who build things.
+- **About section (full):**
+  Hone makes professional AI prompt packs for founders, freelancers, and solopreneurs.
 
-**Compatibility:** Works with Claude (claude.ai), ChatGPT, and any AI chat tool that accepts text prompts.
+  We started Hone because we kept noticing the same problem: people were using Claude and ChatGPT every day but getting mediocre results — not because the AI was bad, but because the prompts were. The right prompt turns a vague answer into something you can actually use.
 
----
+  Every pack we sell is built around a specific use case — client acquisition, email writing, content creation, LinkedIn, and more. Each prompt inside is complete and ready to paste. No placeholders you have to fill in, no instructions you have to decode. Copy it, paste it, use it.
 
-## Pinterest Bio (160 chars)
-AI prompt packs for founders & solopreneurs ⚡ Copy, paste, get results. New packs weekly → link in bio
+  Instant download. PDF format. Works with Claude, ChatGPT, or any AI chat tool.
 
-## Pinterest Board Descriptions
+  Questions? Message us — we read every one.
 
-### AI Prompts for Entrepreneurs
-Ready-to-use Claude and ChatGPT prompts for business owners. Save hours every week with prompts that actually work for outreach, content, strategy, and more.
+- **Shop policies:**
+  PROCESSING TIME: Instant — your download is available immediately after purchase.
+  REFUNDS: Digital products are delivered instantly, so we do not offer refunds. If you have any issue with your download, message us and we will make it right within 24 hours.
+  FORMAT: PDF, optimized for screen reading.
+  COMPATIBILITY: Works with Claude (claude.ai), ChatGPT, Gemini, or any AI chat interface.
 
-### Productivity Templates & Tools
-Templates, frameworks, and prompt packs to help founders and freelancers work smarter. Notion templates, AI workflows, and more.
+### Pinterest Business
+- **Username:** @gethone
+- **Display name:** Hone — AI Prompt Packs
+- **Bio:** AI prompt packs for founders & freelancers. Copy, paste, get results. New packs weekly — link in bio.
 
-### Solopreneur Resources
-Resources for one-person businesses: prompts, templates, tools, and strategies for building a business solo with AI.
-
----
-
-## Product Description Template (Gumroad + Etsy)
-Use this as the base for every product listing:
-
-**[HEADLINE: The outcome in one line]**
-
-You already use AI. The difference between getting generic answers and getting work done is knowing how to ask.
-
-This pack includes [X] ready-to-use prompts for [NICHE]. Every prompt is written to get a specific result — not a starting point you have to edit, a finished output you can actually use.
-
-**What's inside:**
-• [Section 1] — [X] prompts for [use case]
-• [Section 2] — [X] prompts for [use case]
-• [Section 3] — [X] prompts for [use case]
-• [Section 4] — [X] prompts for [use case]
-• [Section 5] — [X] prompts for [use case]
-• [X] bonus tips for getting the most out of every prompt
-
-**Works with:** Claude, ChatGPT, Gemini, or any AI chat tool.
-**Format:** Instant PDF download.
-**Refund policy:** Digital products — no refunds, but contact us with any issue.
+### Email address (for API applications + contact)
+- **Primary:** hello@gethone.co (forward to your personal email until domain is live)
+- **For now:** Use your personal email on all forms, display "hello@gethone.co" on the website once domain is bought
 
 ---
 
-## Brand Colors (for Canva)
-- Primary dark:  #0F172A  (near black, used for text + backgrounds)
-- Accent purple: #6366F1  (indigo — used for highlights, buttons, accents)
-- Background:    #F8FAFC  (off-white)
-- Light accent:  #EEF2FF  (pale indigo for prompt boxes)
+## Domain
+- **Primary:** gethone.co  (~$15/yr on Namecheap or Porkbun)
+- **GitHub Pages URL (free, immediate):** https://[your-github-username].github.io/moneyman
+  Use this on all API applications until the domain is purchased.
+
+---
+
+## Brand colors
+- **Dark:**    #0F172A  (near-black — backgrounds, nav, dark sections)
+- **Accent:**  #6366F1  (indigo — buttons, highlights, brand color)
+- **Accent2:** #818CF8  (lighter indigo — hero text accents, hover states)
+- **Surface:** #F8FAFC  (off-white — page backgrounds)
+- **Muted:**   #64748B  (slate — body text, descriptions)
+- **Border:**  #E2E8F0  (light gray — card borders, dividers)
 
 ## Fonts (Google Fonts — free)
-- Headlines: **Inter** (700 weight)
-- Body:      **Inter** (400 weight)
+- **Headline:** Inter 700 or 800
+- **Body:**     Inter 400
 
 ---
 
-## Canva Setup Instructions
+## Canva setup
 
-### Shop Banner (Gumroad + Etsy): 3360 × 840 px
-- Background: #0F172A
-- Large text (white, Inter Bold): "PromptVault"
-- Smaller text (indigo #6366F1): "Ready-to-use AI prompts for people who build things."
-- Right side: simple abstract geometric pattern or a clean laptop/desk photo (Canva free library)
+### Logo (for all platforms): 500 × 500 px
+- Background: #6366F1 solid
+- Text: "hone" in white, Inter 700, lowercase, centered
+- Or: white geometric diamond/rhombus shape with "hone" below
 
-### Profile Icon / Logo: 500 × 500 px
-- Background: #6366F1 (solid indigo square or circle)
-- White text: "PV" (Inter Bold, centered)
-- Or: white lightning bolt icon (available in Canva free icons)
+### Etsy banner: 3360 × 840 px
+- Left 60%: dark background (#0F172A), large white text "Hone", smaller indigo text "Sharpen your AI output."
+- Right 40%: abstract geometric shapes in indigo tones, or a clean desk/workspace photo (Canva library)
 
-### Pinterest Pin Template: 1000 × 1500 px
-- Top 60%: dark background (#0F172A) with bold white headline
-- Bottom 40%: indigo (#6366F1) with product benefit bullets in white
-- Logo "PromptVault" small in corner
-- Create this once in Canva, save as template, duplicate for each pin
+### Pinterest pin template: 1000 × 1500 px
+- Top two-thirds: dark background with bold white headline (the hook)
+- Bottom third: indigo background with 3 benefit bullets in white
+- "Hone" wordmark small in corner with gethone.co URL
+
+---
+
+## Etsy SEO — tags to use on every listing
+ai prompt pack, chatgpt prompts, claude prompts, ai tools, prompt template,
+business prompts, productivity tools, ai writing, founder tools, solopreneur,
+digital download, ai resources, work smarter
+
+---
+
+## Product description template
+Use this structure for every Lemon Squeezy / Etsy listing:
+
+**[Outcome headline — specific, benefit-driven]**
+
+You already use AI. The problem isn't the tool — it's the prompt.
+
+Getting a generic answer from Claude or ChatGPT is easy. Getting a result you can actually use takes knowing exactly how to ask. That's what this pack is.
+
+**What's inside:**
+• [Section 1] — [X] prompts for [specific use case]
+• [Section 2] — [X] prompts for [specific use case]
+• [Section 3] — [X] prompts for [specific use case]
+• [Section 4] — [X] prompts for [specific use case]
+• [Section 5] — [X] prompts for [specific use case]
+• [X] bonus tips for getting the most out of every prompt
+
+Every prompt is complete and ready to paste. No editing. No guessing.
+
+**Works with:** Claude, ChatGPT, Gemini, or any AI chat interface.
+**Format:** Instant PDF download.
+**Refunds:** Digital products — no refunds, but contact us with any issue.
+
+---
+
+## API re-application copy (Pinterest + Etsy)
+
+When reapplying after getting the website live, use this:
+
+**App name:** Hone Store Manager
+**Website:** https://gethone.co (or GitHub Pages URL in the interim)
+**Use case:** We operate a digital products store (Hone) that sells AI prompt packs. We use the [platform] API to automate publishing new products to our store/boards and to sync sales data for reporting. This is for our own store only, not a third-party service.
+**Privacy policy URL:** https://gethone.co/privacy (or GitHub Pages equivalent)
