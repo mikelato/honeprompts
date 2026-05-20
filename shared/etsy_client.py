@@ -24,7 +24,7 @@ def _keyid() -> str:
     return os.environ["ETSY_KEYSTRING"]
 
 
-# ── OAuth helpers ──────────────────────────────────────────────────────────────
+# -- OAuth helpers --------------------------------------------------------------
 
 def _pkce_pair() -> tuple[str, str]:
     verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b"=").decode()
@@ -86,20 +86,36 @@ def refresh_tokens(tokens: dict) -> dict:
 
 
 def _save_tokens(tokens: dict):
-    from shared.db import db_session
-    from sqlalchemy import text
-    with db_session() as session:
-        session.execute(
-            text("""
-                INSERT INTO kv_store (lane, key, value, updated_at)
-                VALUES ('system', 'etsy_tokens', :v::jsonb, NOW())
-                ON CONFLICT (lane, key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
-            """),
-            {"v": json.dumps(tokens)},
-        )
+    from pathlib import Path
+    local = Path(__file__).resolve().parent.parent / ".etsy_tokens.json"
+    local.write_text(json.dumps(tokens, indent=2))
+
+    try:
+        from shared.db import db_session
+        from sqlalchemy import text
+        with db_session() as session:
+            session.execute(
+                text("""
+                    INSERT INTO kv_store (lane, key, value, updated_at)
+                    VALUES ('system', 'etsy_tokens', :v::jsonb, NOW())
+                    ON CONFLICT (lane, key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+                """),
+                {"v": json.dumps(tokens)},
+            )
+    except Exception:
+        pass  # DB may be unavailable; local file is the primary store
 
 
 def _load_tokens() -> dict:
+    from pathlib import Path
+    import json as _json
+
+    # Try local file first (works even when DB is unavailable)
+    local = Path(__file__).resolve().parent.parent / ".etsy_tokens.json"
+    if local.exists():
+        return _json.loads(local.read_text())
+
+    # Fall back to DB
     from shared.db import db_session
     from sqlalchemy import text
     with db_session() as session:
@@ -107,7 +123,7 @@ def _load_tokens() -> dict:
             text("SELECT value FROM kv_store WHERE lane='system' AND key='etsy_tokens'")
         ).fetchone()
     if not row:
-        raise RuntimeError("No Etsy tokens found. Run etsy_auth.py to authenticate.")
+        raise RuntimeError("No Etsy tokens found. Run: python run.py content:etsy-auth")
     return row[0]
 
 
@@ -121,7 +137,7 @@ def _auth_headers() -> dict[str, str]:
     }
 
 
-# ── Listing helpers ────────────────────────────────────────────────────────────
+# -- Listing helpers ------------------------------------------------------------
 
 def get_shop_id() -> int:
     resp = requests.get(f"{ETSY_API_BASE}/application/openapi-ping", headers=_auth_headers())

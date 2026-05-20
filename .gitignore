@@ -122,3 +122,6 @@ playwright-report/
 
 products/*.pdf
 products/*.json
+.etsy_tokens.json
+.etsy_oauth_state.json
+brand/

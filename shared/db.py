@@ -43,7 +43,7 @@ def db_session() -> Session:
 
 
 def log_run(session: Session, lane: str, action: str, payload: dict, result: dict, success: bool):
-    """Append-only audit log — never update, only insert."""
+    """Append-only audit log -- never update, only insert."""
     session.execute(
         text("""
             INSERT INTO run_log (lane, action, payload, result, success, created_at)
