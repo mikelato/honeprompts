@@ -83,6 +83,11 @@ def _card(p: dict) -> str:
     tag = _tag(slug)
     buy_url = _get_buy_url(slug)
 
+    if buy_url and buy_url != "#":
+        action = f'<a href="{buy_url}" class="product-btn">Get it</a>'
+    else:
+        action = '<span class="product-btn product-btn--soon">Coming soon</span>'
+
     return f"""      <div class="product-card">
         <span class="product-tag">{tag}</span>
         <h3>{title}</h3>
@@ -92,7 +97,7 @@ def _card(p: dict) -> str:
             <div class="product-price">${price}</div>
             <div class="product-count">{prompt_count} prompts &middot; {len(sections)} sections</div>
           </div>
-          <a href="{buy_url}" class="product-btn">Get it</a>
+          {action}
         </div>
       </div>"""
 

@@ -187,6 +187,7 @@ section { padding: 5rem 2rem; }
   font-weight: 600;
 }
 .product-btn:hover { background: #4F46E5; text-decoration: none; }
+.product-btn--soon { background: transparent; color: var(--muted); border: 1px solid var(--border); cursor: default; pointer-events: none; }
 
 /* ── How it works ── */
 .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; }
