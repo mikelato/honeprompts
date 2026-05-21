@@ -17,7 +17,7 @@ OUTPUT_DIR = Path(__file__).resolve().parents[2] / "brand"
 
 
 def run():
-    json_files = sorted(PRODUCTS_DIR.glob("*.json"))
+    json_files = sorted(f for f in PRODUCTS_DIR.glob("*.json") if f.name != "urls.json")
     if not json_files:
         print("[export] No products found. Run content:generate first.")
         return

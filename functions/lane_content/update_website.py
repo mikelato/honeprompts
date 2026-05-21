@@ -46,6 +46,18 @@ def _tag(slug: str) -> str:
 
 
 def _get_buy_url(slug: str) -> str:
+    # Check local urls.json first (populated after manual listing)
+    urls_file = PRODUCTS_DIR / "urls.json"
+    if urls_file.exists():
+        try:
+            with open(urls_file, encoding="utf-8") as f:
+                urls = json.load(f)
+            url = urls.get(slug, "#")
+            if url and url != "#":
+                return url
+        except Exception:
+            pass
+    # Fall back to DB (Lemon Squeezy buy_now_url)
     try:
         from shared.db import db_session
         from sqlalchemy import text
@@ -86,7 +98,7 @@ def _card(p: dict) -> str:
 
 
 def run(domain: str | None = None):
-    json_files = sorted(PRODUCTS_DIR.glob("*.json"))
+    json_files = sorted(f for f in PRODUCTS_DIR.glob("*.json") if f.name != "urls.json")
     if not json_files:
         print("[website] No products found.")
         return

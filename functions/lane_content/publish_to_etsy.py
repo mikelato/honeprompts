@@ -101,7 +101,7 @@ def publish_product_to_etsy(product_data: dict, pdf_path: str) -> dict:
 
 def run(target_slug: str | None = None):
     """List all unlisted local products on Etsy, or a specific slug."""
-    json_files = sorted(PRODUCTS_DIR.glob("*.json"))
+    json_files = sorted(f for f in PRODUCTS_DIR.glob("*.json") if f.name != "urls.json")
     if not json_files:
         print("[etsy] No products found in products/. Run content:generate first.")
         return

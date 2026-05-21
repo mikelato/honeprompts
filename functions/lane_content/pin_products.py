@@ -108,7 +108,7 @@ def generate_pins_for_product(product_data: dict, url: str, count: int = 3) -> l
 
 
 def run(pins_per_product: int = 3):
-    json_files = sorted(PRODUCTS_DIR.glob("*.json"))
+    json_files = sorted(f for f in PRODUCTS_DIR.glob("*.json") if f.name != "urls.json")
     if not json_files:
         print("[pin] No products found in products/. Run content:generate first.")
         return
