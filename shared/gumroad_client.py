@@ -42,9 +42,11 @@ def create_product(
 
 
 def attach_file(product_id: str, file_path: str) -> dict[str, Any]:
+    from urllib.parse import quote
+    safe_id = quote(product_id, safe="")
     with open(file_path, "rb") as f:
         resp = requests.post(
-            f"{GUMROAD_API_BASE}/products/{product_id}/product_files",
+            f"{GUMROAD_API_BASE}/products/{safe_id}/product_files",
             params=_auth_params(),
             files={"file": f},
         )
@@ -53,8 +55,10 @@ def attach_file(product_id: str, file_path: str) -> dict[str, Any]:
 
 
 def publish_product(product_id: str) -> dict[str, Any]:
+    from urllib.parse import quote
+    safe_id = quote(product_id, safe="")
     resp = requests.put(
-        f"{GUMROAD_API_BASE}/products/{product_id}",
+        f"{GUMROAD_API_BASE}/products/{safe_id}",
         data={**_auth_params(), "published": True},
     )
     resp.raise_for_status()

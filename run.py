@@ -29,6 +29,7 @@ COMMANDS = {
     "content:report":    "functions.lane_content.income_report",
     "content:export":    "functions.lane_content.export_listings",
     "content:website":   "functions.lane_content.update_website",
+    "content:gumroad":   "functions.lane_content.publish_to_gumroad",
 }
 
 
